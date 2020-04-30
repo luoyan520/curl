@@ -1,7 +1,7 @@
 <?php
 declare (strict_types=1);
 
-namespace luoyan;
+namespace LuoYan;
 
 class Curl
 {
