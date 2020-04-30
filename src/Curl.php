@@ -5,14 +5,14 @@ namespace LuoYan;
 
 class Curl
 {
-    private string $cookie = '';//获取到的cookie
-    private string $ip = '';// 模拟IP
-    private string $ua = '';// 模拟UA
-    private string $referer = '';// 模拟referer
-    private string $user = '';// HTTP认证用户名
-    private string $password = '';// HTTP认证密码
-    private string $needHeader = ''; // 是否需要header信息
-    private string $noBody = ''; // 是否需要body信息
+    private string $cookie = '';        //获取到的cookie
+    private string $ip = '';            // 模拟IP
+    private string $ua = '';            // 模拟UA
+    private string $referer = '';       // 模拟referer
+    private string $user = '';          // HTTP认证用户名
+    private string $password = '';      // HTTP认证密码
+    private string $needHeader = '';    // 是否需要header信息
+    private string $noBody = '';        // 是否需要body信息
 
     /**
      * Curl开始执行
@@ -23,26 +23,26 @@ class Curl
      */
     public function exec(string $url, $post = []): string
     {
-        $curl = curl_init();//初始化
-        curl_setopt($curl, CURLOPT_TIMEOUT, 60); // 超时时间
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false); // 避开ssl证书检查
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false); // 避开ssl证书检查
-        curl_setopt($curl, CURLOPT_ENCODING, 'gzip'); // 开启GZIP
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); // 设置是否将响应结果存入变量
+        $curl = curl_init();                                //初始化
+        curl_setopt($curl, CURLOPT_TIMEOUT, 60);            // 超时时间
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);  // 避开ssl证书检查
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);  // 避开ssl证书检查
+        curl_setopt($curl, CURLOPT_ENCODING, 'gzip');       // 开启GZIP
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);      // 设置是否将响应结果存入变量
 
         $head_init = array();
         $head_init[] = 'Accept:*/*';
         $head_init[] = 'Accept-Encoding:gzip,deflate,sdch';
         $head_init[] = 'Accept-Language:zh-CN,zh;q=0.8';
-        $head_init[] = "X-FORWARDED-FOR:{$this->ip}";//模拟IP
+        $head_init[] = "X-FORWARDED-FOR:{$this->ip}";           //模拟IP
         $head_init[] = "CLIENT-IP: {$this->ip}";
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $head_init); // 初始化头部
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $head_init);     // 初始化头部
 
         if ($this->user && $this->password) {
             curl_setopt($curl, CURLOPT_USERPWD, $this->user . ':' . $this->password); // HTTP认证
         }
-        curl_setopt($curl, CURLOPT_COOKIE, $this->cookie); // 模拟cookies
-        curl_setopt($curl, CURLOPT_REFERER, $this->referer); // 模拟referer
+        curl_setopt($curl, CURLOPT_COOKIE, $this->cookie);      // 模拟cookies
+        curl_setopt($curl, CURLOPT_REFERER, $this->referer);    // 模拟referer
 
         if ($this->ua) {
             curl_setopt($curl, CURLOPT_USERAGENT, $this->ua);
@@ -50,19 +50,19 @@ class Curl
             curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36');
         }
 
-        curl_setopt($curl, CURLOPT_URL, $url); // 初始化URL
+        curl_setopt($curl, CURLOPT_URL, $url);   // 初始化URL
 
-        if (!empty($post)) { // post请求
-            curl_setopt($curl, CURLOPT_POST, 1); // 表明是post请求
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $post); // post内容
+        if (!empty($post)) {                                // post请求
+            curl_setopt($curl, CURLOPT_POST, 1);            // 表明是post请求
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $post);  // post内容
         }
 
         if ($this->noBody) {
-            curl_setopt($curl, CURLOPT_NOBODY, 1); // 设定是否输出页面内容，非0不输出
+            curl_setopt($curl, CURLOPT_NOBODY, 1);  // 设定是否输出页面内容，非0不输出
         }
 
         if ($this->needHeader) {
-            curl_setopt($curl, CURLOPT_HEADER, TRUE); // 设定是否显示头信息
+            curl_setopt($curl, CURLOPT_HEADER, TRUE);   // 设定是否显示头信息
         }
         $result = curl_exec($curl);
         curl_close($curl);
