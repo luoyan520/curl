@@ -20,7 +20,7 @@ class Curl
     private string $password = '';      // HTTP认证密码
     private string $needHeader = '';    // 是否需要header信息
     private string $noBody = '';        // 是否需要body信息
-    private string $returnCookie = '';  // 远程返回的cookie
+    private array $returnCookie = [];  // 远程返回的cookie
 
     /**
      * Curl开始执行
@@ -99,26 +99,48 @@ class Curl
         // 关闭curl
         curl_close($curl);
 
-        // 提取页面返回的cookies
-        $this->returnCookie = $this->getCookie($result);
+        if ($this->needHeader) {
+            // 拆分出页面header和body
+            list($header, $body) = explode("\r\n\r\n", $result);
+
+            // 提取页面返回的cookies
+            $this->returnCookie = $this->getCookie($result);
+        }
 
         return $result;
     }
 
     /**
-     * 解析出网页是否要更新cookies
-     * @param string $result Curl的结果
-     * @return string cookies
+     * 解析出网页是否要更新cookie
+     * @param string $header curl返回的header
+     * @return array cookie
      */
-    private function getCookie(string $result): string
+    private function getCookie(string $header): array
     {
-        // 解析返回内容
-        list($header, $body) = explode('\r\n\r\n', $result);
-
         // 解析cookie
-        $matches = '';
-        preg_match('/set\-cookie:([^\r\n]*)/i', $header, $matches);
-        return $matches[1];
+        preg_match_all('/set\-cookie:([^\r\n]*)/i', $header, $matches);
+
+        $cookie = [];
+
+        foreach ($matches[1] as $v) {
+            // 找关键位点
+            $sign_position_start = strpos($v, '=');
+            $sign_position_end = strpos($v, ';');
+
+            // 得出cookie的名称和值
+            $cookie_name = substr($v, 1, $sign_position_start - 1);
+            $cookie_value = substr($v, $sign_position_start + 1, $sign_position_end - $sign_position_start - 1);
+
+            // 将得出的值urldecode
+            $cookie_name = urldecode($cookie_name);
+            $cookie_value = urldecode($cookie_value);
+
+            // 生成返回数组
+            $cookie[$cookie_name] = $cookie_value;
+        }
+
+        // 返回cookie数组
+        return $cookie;
     }
 
     /**
