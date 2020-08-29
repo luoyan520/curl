@@ -106,7 +106,7 @@ class Curl
      * @param string $header curl返回的header
      * @return array cookie
      */
-    private function getCookie(string $header): array
+    public function getCookie(string $header): array
     {
         // 解析cookie
         preg_match_all('/set\-cookie:([^\r\n]*)/i', $header, $matches);
@@ -141,9 +141,11 @@ class Curl
      * 设置Curl参数
      * @param string $name 要设置的参数名称
      * @param int|string $value 要设置的值
+     * @return Curl
      */
-    public function set(string $name, $value): void
+    public function set(string $name, $value)
     {
         $this->$name = $value;
+        return $this;
     }
 }
