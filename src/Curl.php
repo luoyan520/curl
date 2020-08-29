@@ -20,7 +20,8 @@ class Curl
     private string $password = '';      // HTTP认证密码
     private string $needHeader = '';    // 是否需要header信息
     private string $noBody = '';        // 是否需要body信息
-    private array $returnCookie = [];  // 远程返回的cookie
+
+    public array $returnCookie = [];  // 远程返回的cookie
 
     /**
      * Curl开始执行
@@ -104,7 +105,7 @@ class Curl
             list($header, $body) = explode("\r\n\r\n", $result);
 
             // 提取页面返回的cookies
-            $this->returnCookie = $this->getCookie($result);
+            $this->returnCookie = $this->getCookie($header);
         }
 
         return $result;
@@ -123,6 +124,9 @@ class Curl
         $cookie = [];
 
         foreach ($matches[1] as $v) {
+            // 拼接到$this->cookie
+            $this->cookie .= $v;
+
             // 找关键位点
             $sign_position_start = strpos($v, '=');
             $sign_position_end = strpos($v, ';');
