@@ -21,8 +21,6 @@ class Curl
     private string $needHeader = '';    // 是否需要header信息
     private string $noBody = '';        // 是否需要body信息
 
-    public array $returnCookie = [];  // 远程返回的cookie
-
     /**
      * Curl开始执行
      * @param string $url 要访问的链接
@@ -99,14 +97,6 @@ class Curl
         $result = curl_exec($curl);
         // 关闭curl
         curl_close($curl);
-
-        if ($this->needHeader) {
-            // 拆分出页面header和body
-            list($header, $body) = explode("\r\n\r\n", $result);
-
-            // 提取页面返回的cookies
-            $this->returnCookie = $this->getCookie($header);
-        }
 
         return $result;
     }
