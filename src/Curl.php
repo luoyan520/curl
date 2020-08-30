@@ -98,43 +98,29 @@ class Curl
         // 关闭curl
         curl_close($curl);
 
+        // 更新cookies
+        $this->updateCookie($result);
+
         return $result;
     }
 
     /**
-     * 解析出网页是否要更新cookie
-     * @param string $header curl返回的header
-     * @return array cookie
+     * 执行网页的cookies更新请求
+     * @param string $result curl返回的内容
      */
-    public function getCookie(string $header): array
+    private function updateCookie(string $result): void
     {
+        // 解析返回内容
+        list($header, $body) = explode('\r\n\r\n', $result);
+        unset($body);
+
         // 解析cookie
         preg_match_all('/set\-cookie:([^\r\n]*)/i', $header, $matches);
-
-        $cookie = [];
 
         foreach ($matches[1] as $v) {
             // 拼接到$this->cookie
             $this->cookie .= $v;
-
-            // 找关键位点
-            $sign_position_start = strpos($v, '=');
-            $sign_position_end = strpos($v, ';');
-
-            // 得出cookie的名称和值
-            $cookie_name = substr($v, 1, $sign_position_start - 1);
-            $cookie_value = substr($v, $sign_position_start + 1, $sign_position_end - $sign_position_start - 1);
-
-            // 将得出的值urldecode
-            $cookie_name = urldecode($cookie_name);
-            $cookie_value = urldecode($cookie_value);
-
-            // 生成返回数组
-            $cookie[$cookie_name] = $cookie_value;
         }
-
-        // 返回cookie数组
-        return $cookie;
     }
 
     /**
@@ -147,5 +133,38 @@ class Curl
     {
         $this->$name = $value;
         return $this;
+    }
+
+    /**
+     * 获取当前的cookies数组
+     * @param array $cookie 系统保存的cookies
+     * @return array cookie
+     */
+    public function getCookie(array $cookie): array
+    {
+        $result = [];
+
+        foreach ($cookie as $v) {
+            // 正则匹配单条cookie
+            preg_match_all('/(.+?)=(.+?);/', $v, $matches);
+
+            // 获取cookie的名称和值
+            $cookie_name = $matches[1];
+            $cookie_value = $matches[2];
+
+//            // 找关键位点
+//            $sign_position_start = strpos($v, '=');
+//            $sign_position_end = strpos($v, ';');
+//
+//            // 得出cookie的名称和值
+//            $cookie_name = substr($v, 1, $sign_position_start - 1);
+//            $cookie_value = substr($v, $sign_position_start + 1, $sign_position_end - $sign_position_start - 1);
+
+            // 生成返回数组
+            $result[$cookie_name] = $cookie_value;
+        }
+
+        // 返回cookie数组
+        return $result;
     }
 }
