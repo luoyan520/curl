@@ -12,7 +12,7 @@ namespace LuoYan;
 class Curl
 {
     private array $header = [];         // 模拟header
-    private string $cookie = '';        // 模拟cookie
+    public string $cookie = '';        // 模拟cookie
     private string $ip = '';            // 模拟IP
     private string $userAgent = '';     // 模拟UA
     private string $referer = '';       // 模拟referer
