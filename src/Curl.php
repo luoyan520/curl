@@ -146,7 +146,7 @@ class Curl
 
         foreach ($cookie as $v) {
             // 正则匹配单条cookie
-            preg_match_all('/(.+?)=(.+?);/', $v, $matches);
+            preg_match('/(.+?)=(.+?);/', $v, $matches);
 
             // 获取cookie的名称和值
             $cookie_name = $matches[1];
